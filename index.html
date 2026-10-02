@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Выбор ниши | ТЕРРА</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ground:#EEF1EA; --surface:#FFFFFF; --ink:#14231D; --soft:#5B6A62;
+  --moss:#2F6B4F; --deep:#17362E; --sun:#E0A526; --clay:#B4472E; --line:#D3DACF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5}
+h1,h2,h3{font-family:"Unbounded","Golos Text",system-ui,sans-serif;line-height:1.25;margin:0;overflow-wrap:anywhere}
+h1{font-size:clamp(24px,6vw,36px);font-weight:700}
+h2{font-size:clamp(18px,4.6vw,24px);font-weight:500}
+h3{font-size:15px;font-weight:500}
+p{margin:0 0 12px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+.top{position:sticky;top:0;z-index:5;background:var(--deep);color:#fff;padding:10px 16px 12px}
+.top-row{display:flex;align-items:center;gap:12px;max-width:760px;margin:0 auto}
+.top-title{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.menu-btn{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 12px;font-size:14px;white-space:nowrap}
+.strata{display:flex;gap:3px;max-width:760px;margin:10px auto 0}
+.strata i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.2)}
+.strata i.done{background:var(--sun)}
+.strata i.now{background:#fff}
+
+main{max-width:760px;margin:0 auto;padding:24px 16px 120px}
+.sec{color:var(--moss);font-weight:600;font-size:15px;margin-bottom:8px;overflow-wrap:anywhere}
+.hint{color:var(--soft);margin-top:10px;white-space:pre-line}
+.note{background:#E3EADF;border-left:4px solid var(--moss);padding:12px 14px;border-radius:0 10px 10px 0;margin:16px 0;font-size:15px}
+.author{white-space:pre-line;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:16px 0;font-size:15px;overflow-wrap:anywhere}
+
+label{display:block;font-size:14px;color:var(--soft);margin:12px 0 4px;overflow-wrap:anywhere}
+input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px}
+textarea{resize:vertical;min-height:48px}
+input:focus,textarea:focus,select:focus{border-color:var(--moss);outline:none}
+.row{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+.row .num{flex:none;width:30px;padding-top:12px;color:var(--soft);font-weight:600;text-align:right}
+.row .grow{flex:1;min-width:0}
+.x{flex:none;background:none;border:none;color:var(--soft);font-size:22px;line-height:1;padding:10px 6px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media(max-width:420px){.two{grid-template-columns:1fr}}
+
+.btn{background:var(--surface);border:1.5px solid var(--moss);color:var(--moss);border-radius:10px;padding:10px 14px;font-weight:500;margin-top:14px}
+.btn.fill{background:var(--moss);color:#fff}
+.btn.big{width:100%;padding:15px;font-size:18px}
+.btn.warn{border-color:var(--clay);color:var(--clay)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+
+details{margin-top:16px;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;color:var(--moss);font-weight:500}
+details ul{margin:10px 0 4px;padding-left:20px}
+details li{margin-bottom:4px;white-space:pre-line;overflow-wrap:anywhere}
+
+.crit{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.crit:last-child{border-bottom:none}
+.crit span{flex:1;min-width:0;overflow-wrap:anywhere}
+.yn{display:flex;gap:6px;flex:none}
+.yn button{min-width:54px;padding:8px 0;border-radius:9px;border:1.5px solid var(--line);background:var(--surface)}
+.yn button.on-y{background:var(--moss);border-color:var(--moss);color:#fff}
+.yn button.on-n{background:var(--clay);border-color:var(--clay);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 11px;font-size:14px;max-width:100%;overflow-wrap:anywhere;text-align:left}
+.chip.cur{border-color:var(--deep);background:var(--deep);color:#fff}
+.chip b{color:var(--sun)}
+.score{font-family:"Unbounded",sans-serif;font-size:40px;font-weight:700;color:var(--moss);line-height:1}
+
+.rank{display:flex;align-items:center;gap:10px;margin-top:10px}
+.rank .name{flex:0 0 42%;min-width:0;overflow-wrap:anywhere;font-size:15px}
+.rank .bar{flex:1;height:14px;background:var(--line);border-radius:7px;overflow:hidden}
+.rank .bar i{display:block;height:100%;background:var(--sun)}
+.rank .pts{flex:none;width:28px;text-align:right;font-weight:600}
+
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.calc div{background:var(--ground);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--soft);overflow-wrap:anywhere}
+.calc b{display:block;font-size:17px;color:var(--ink)}
+
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.nav div{max-width:760px;margin:0 auto;display:flex;gap:10px}
+.nav button{flex:1;border-radius:12px;padding:13px;border:1.5px solid var(--moss);background:var(--surface);color:var(--moss);font-weight:600}
+.nav button.next{background:var(--moss);color:#fff;flex:2}
+.nav button:disabled{opacity:.35}
+
+.menu{position:fixed;inset:0;z-index:10;background:var(--deep);color:#fff;padding:20px 16px;overflow:auto;display:none}
+.menu.open{display:block}
+.menu-in{max-width:760px;margin:0 auto}
+.menu button.go{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.15);color:#fff;padding:14px 0;font-size:17px;overflow-wrap:anywhere}
+.menu button.go.cur{color:var(--sun)}
+.saved{font-size:13px;color:var(--soft);margin-top:18px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-row">
+    <div class="top-title" id="topTitle"></div>
+    <button class="menu-btn" data-act="menu">Разделы</button>
+  </div>
+  <div class="strata" id="strata" aria-hidden="true"></div>
+</header>
+<main id="main"></main>
+<div class="nav"><div>
+  <button data-act="prev" id="prevBtn">Назад</button>
+  <button class="next" data-act="next" id="nextBtn">Дальше</button>
+</div></div>
+<div class="menu" id="menu"><div class="menu-in" id="menuIn"></div></div>
+<datalist id="nl"></datalist>
+
+<script>
+/* ===== Авторские тексты (дословно из таблицы «ВЫБОР НИШИ | ТЕРРА») ===== */
+const RULE=[
+ 'ВАЖНО!','',
+ '1. Создай для себя отдельную копию данного файла.','',
+ 'Для этого выбери в меню ФАЙЛ подраздел СОЗДАТЬ КОПИЮ.',
+ 'Далее выбери на своём гугл диске место для сохранения копии.','',
+ '2. Переименуй свою копию следущим образом: Твоё Имя Фамилия |  ВЫБОР НИШИ | ТЕРРА','',
+ 'Пример: Сергей Мурыгин |  ВЫБОР НИШИ | ТЕРРА','',
+ '3. В правом верхнем углу нажми "Настройка доступа". В меню Общий доступ выбери "Все, у кого есть ссылка". ',
+ 'Далее справа выбери "Читатель". Нажми "Скопировать ссылку" и потом нажми "Готово"','',
+ '4. Скопированную ссылку на Таблицу отправь Руководителю школы Сергею Мурыгину в Телеграмм на @murser888',
+ 'Если хочешь получить обратную связь от других участников группы, тогда размести свою ссылку в теме "Домашнии задания" в общей группе.'];
+
+const DIAG=[
+ {q:'1. ЧТО Я ЛЮБЛЮ ДЕЛАТЬ?',ex:['Люблю спать','Люблю читать','Люблю играть в компьютерные игры','Люблю дорогое вино','Заниматься пилатесом','Читать про маркетинг','Люблю кататься на велике']},
+ {q:'2. В ЧЕМ Я РАЗБИРАЮСЬ ЛУЧШЕ, ЧЕМ 95% МОЕГО ОКРУЖЕНИЯ?',ex:['Работа с гугл документами','Графический дизайн','Аналитика','Ведение соцсетей']},
+ {q:'3. В ЧЕМ У МЕНЯ ЕСТЬ ОПЫТ?',h:'(работа в найме, опыт в бизнесе, проф.образование: курсы, универы, кружки и т.д.)',
+  b:'Идеи ниш из этого опыта',
+  ex:['6 лет Экономического образования','Доп образование "Переводчик в сфере профессиональной коммуникации"','Работала с брендом, вела соцсети'],
+  exb:['1. Фотосессии\n2. Обучение ретуши\n3. Фотошкола\n4. Фотостудия\n5. Студия для съмки вебинаров и онлайн уроков','1. Обучение Digital art \n2. Продажа Digital портретов\n3. Онлайн школа рисования\n4. Офлайн школа рисования для детей\n5. Офлайн школа рисования для взрослых','1. Консалтинг для бизнеса\n2. Создание корпоративных баз знаний\n3. Корпоративные тренинги\n4. Автоматизация бизнеса\n5. Траблшутинг']},
+ {q:'4. ЧТО Я ГОТОВ(А) ДЕЛАТЬ БЕСПЛАТНО',h:'(хочу расти в этом, готов делать нон-стоп, лишь бы делать)',ex:['Обрабатывать фотографии','Рисовать','Смотреть ролики про бизнес','Графический']},
+ {q:'5. ЧТО Я БЫ ДЕЛАЛ(А), ЕСЛИ БЫ ДЕНЬГИ БЫЛИ НЕ НУЖНЫ?',h:'(Есть всё, закрыты все потребности, деньги больше не нужны. Чем я буду заниматься в кайф)',ex:['Путешествовала','Привозил бы редкие вещи из разных стран','Выиграл гонку тур де Франс']},
+ {q:'6. В ЧЕМ У МЕНЯ ЕСТЬ РАЗРЕШЕНИЕ?',h:'(контакт с человеком, который может предоставить вам товар или услугу на эксклюзивных для рынка условиях. Или эксперт в своём деле, который сам себя не продаёт)',ex:['Есть знакомые, которые сейчас живут в Китае','Подруга классно печет торты','Уменяю классно вести переговоры с подрядчиками','Знаю HR крупных компаний','Таргетолог']},
+ {q:'7. К КАКОЙ СОЦИАЛЬНОЙ ГРУППЕ ОТНОСИШЬСЯ?',b:'Где собирается эта группа',
+  ex:['Путешественники по Couchserfing','Студент','Предприниматель','Собственник квартиры в многоквартирном доме','Студент курсов по смм','Бизнес сообщества'],
+  exb:['Чат студентов моего\nКомитет профоргов\n...\nСоцсети']}
+];
+const FIXED=['Растущий рынок','Рынок сформирован','Рынок разобщен'];
+const CRIT_HINT=['Привести детей на работу','Можно сделать ярд выручки'];
+const NICHE_EX=['Банкроство физ лиц','Дитейлинг (инстаграм)','продажа товаров оптом','кафе, кондитерская','продажа на валдберис и инстаграм','SMM','Создание личного бренда','студия маникюра','проведение мастер майндов','Квесты'];
+const COMP_TEXT='Выпиши 10 конкурентов для каждой из 4 выбранных тобой ниши. Каких конкурентов искать?\n✔ В городе, похожем на ваш\n✔ Запустился меньше года назад\n✔ С ресурсами как у вас\n✔ Делает столько денег, сколько вы хотите';
+const SEG_PH=['16-25 лет, РФ','26-35 лет, РФ','>35 лет, РФ','Критерием 4','Критерием 5'];
+const MKT_COMM=['Суммарный оборот компаний отрасли по России (согласно исследованиям) ','Консолидированный ли рынок? Количество предприятий на рынке? Наличие монополиста','Как будет вести себя рынок в случае снижения уровня доходов населения?','Прочие комментарии '];
+const MKT_COMM_EX=['15 000 000 000','6 крупных производителей','Будет повышать чек, заниматься доставкой ',''];
+
+const LISTS={
+ period:{min:1,fields:[['n','НИША',{nl:1}],['t','ТЕМА'],['s','ИСТОЧНИК'],['h','МАТЕРИАЛ: ЗАГОЛОВОК',{area:1}],['l','МАТЕРИАЛ: ССЫЛКА'],['v','ВЫВОД',{area:1}]]},
+ ws:{min:1,fields:[['q','Запрос',{nl:1}],['d','Спрос на Wordstat'],['r','Лучший регион по соотношению показы / популярность'],['c','Показов в месяц в городе/регионе'],['t','Тренд в нише',{opts:['Растет','Стоит','Падает']}],['m','Месяц пика']]},
+ off:{min:1,fields:[['n','ниша',{nl:1}],['nd','новые конкуренты за 2 года: динамика',{opts:['Рост','Падение']}],['nc','новые конкуренты за 2 года: кол-во'],['cd','закрытые конкуренты за 2 года: динамика',{opts:['Рост','Падение']}],['cc','закрытые конкуренты за 2 года: кол-во'],['rd','регистрации в 2 гис/гугл/яндекс: динамика',{opts:['Рост','Падение']}],['rc','регистрации в 2 гис/гугл/яндекс: количество']]}
+};
+
+/* ===== Шаги ===== */
+const STEPS=[{id:'intro',sec:'Начало'}];
+DIAG.forEach((d,i)=>STEPS.push({id:'d'+i,sec:'1. Диагностика основателя'}));
+STEPS.push({id:'niches',sec:'2. Список ниш'},{id:'crit',sec:'2. Список ниш'},{id:'score',sec:'2. Список ниш'},{id:'rating',sec:'2. Список ниш'},
+ {id:'period',sec:'3. Анализ периодики'},{id:'ws',sec:'4. Анализ спроса через Яндекс W'},{id:'off',sec:'5. Анализ офлайн бизнеса'},
+ {id:'top',sec:'6. ТОП НИШ'},{id:'market',sec:'9. Оценка Рынка'},{id:'comp',sec:'7. Анализ Конкурентов'},{id:'fin',sec:'Готово'});
+const SECS=[...new Set(STEPS.map(s=>s.sec))];
+
+/* ===== Состояние ===== */
+const KEY='terra-vybor-nishi-v1';
+function blank(){return{
+ step:0,ni:0,name:'',
+ diag:DIAG.map(()=>[{a:'',b:''},{a:'',b:''},{a:'',b:''}]),
+ niches:Array(15).fill(''),crit:Array(7).fill(''),marks:Array.from({length:15},()=>Array(10).fill('')),
+ period:[{}],ws:[{}],off:[{}],top:['','',''],
+ m:{tam:'',seg:SEG_PH.map(()=>({n:'',d:''})),som:'',chek:'',purch:'',cli:'',c:['','','',''],links:''},
+ compN:['','','',''],comp:[0,1,2,3].map(()=>Array.from({length:5},()=>({n:'',l:''})))
+};}
+let S=blank(),mem=true;
+function load(){try{const r=localStorage.getItem(KEY);mem=false;if(r)S=Object.assign(blank(),JSON.parse(r));}catch(e){mem=true}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){mem=true}}
+
+/* ===== Помощники ===== */
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const get=p=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+function set(p,v){const ks=p.split('.');let o=S;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=v;save();}
+function inp(p,ph,o){o=o||{};const v=get(p);
+ if(o.opts)return `<select data-p="${p}"><option value=""></option>${o.opts.map(x=>`<option${v===x?' selected':''}>${x}</option>`).join('')}</select>`;
+ if(o.area)return `<textarea data-p="${p}" rows="${o.rows||2}" placeholder="${esc(ph||'')}">${esc(v)}</textarea>`;
+ return `<input data-p="${p}" placeholder="${esc(ph||'')}" value="${esc(v)}"${o.nl?' list="nl"':''}${o.num?' inputmode="decimal"':''}>`;}
+const num=v=>{const n=parseFloat(String(v==null?'':v).replace(/\s/g,'').replace(',','.'));return isFinite(n)?n:0;};
+const fmt=n=>isFinite(n)?n.toLocaleString('ru-RU',{maximumFractionDigits:3}):'0';
+const critNames=()=>FIXED.concat(S.crit);
+const activeCrit=()=>critNames().map((n,i)=>({n,i})).filter(c=>c.n.trim());
+const filledNiches=()=>S.niches.map((n,i)=>({n,i})).filter(x=>x.n.trim());
+const pts=i=>S.marks[i].filter((m,j)=>m==='Да'&&critNames()[j].trim()).length;
+const ranking=()=>filledNiches().map(x=>({...x,p:pts(x.i)})).sort((a,b)=>b.p-a.p);
+function examples(title,items){return `<details><summary>${title}</summary><ul>${items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`;}
+
+function calc(){const m=S.m,tam=num(m.tam),chek=num(m.chek),purch=num(m.purch);
+ const r={tamF:tam*chek*purch,segE:[],segF:[]};let e=tam,f=r.tamF;
+ m.seg.forEach((s,i)=>{e=e*num(s.d)/100;f=f*num(s.d)/100;r.segE[i]=e;r.segF[i]=f;});
+ /* как в авторской таблице: SOM считается от второй строки сегментации */
+ r.somE=r.segE[1]*num(m.som)/100;r.somF=r.segF[1]*num(m.som)/100;
+ r.cliF=num(m.cli)*chek*12;return r;}
+
+/* ===== Экраны ===== */
+const V={};
+V.intro=()=>`<h1>Выбор ниши</h1>
+ <p class="hint">Пошаговый блокнот по таблице Сергея Мурыгина, школа «От идеи до реализации», ТЕРРА. Вопросы и формулировки автора сохранены. В конце ты скачаешь Excel-файл той же структуры, что и исходная таблица.</p>
+ <label>Твоё Имя Фамилия</label>${inp('name','Например: Сергей Мурыгин')}
+ <div class="note">${mem?'В этом окне ответы хранятся только до закрытия страницы. На сайте они будут сохраняться в браузере автоматически.':'Ответы сохраняются в этом браузере автоматически. Можно закрыть страницу и вернуться позже.'}</div>
+ <p>Впереди 8 разделов: диагностика основателя, список ниш с оценкой по критериям, анализ периодики, спроса и офлайн бизнеса, топ-3, оценка рынка и конкуренты.</p>`;
+
+function diagView(q){const d=DIAG[q],rows=S.diag[q];
+ return `<div class="sec">ДИАГНОСТИКА ОСНОВАТЕЛЯ. Ответь на 7 простых вопросов ниже:</div>
+ <h2>${esc(d.q)}</h2>${d.h?`<p class="hint">${esc(d.h)}</p>`:''}
+ ${rows.map((r,i)=>`<div class="row"><div class="num">${i+1}</div><div class="grow">${inp(`diag.${q}.${i}.a`,'Твой ответ')}${d.b?`<label>${d.b}</label>${inp(`diag.${q}.${i}.b`,'',{area:1,rows:3})}`:''}</div>${rows.length>1?`<button class="x" data-act="delDiag" data-arg="${q}.${i}" aria-label="Удалить">×</button>`:''}</div>`).join('')}
+ <button class="btn" data-act="addDiag" data-arg="${q}">Добавить ещё ответ</button>
+ ${examples('Посмотреть примеры автора',d.ex)}
+ ${d.exb?examples('Примеры автора: '+d.b.toLowerCase(),d.exb):''}`;}
+DIAG.forEach((d,i)=>V['d'+i]=()=>diagView(i));
+
+V.niches=()=>{const mine=S.diag.map((rows,q)=>{const a=rows.filter(r=>(r.a||'').trim()||(r.b||'').trim());
+  return a.length?`<li><b>${esc(DIAG[q].q)}</b>\n${a.map(r=>esc(r.a)+(r.b?'\n'+esc(r.b):'')).join('\n')}</li>`:'';}).join('');
+ return `<div class="sec">СПИСОК НИШ</div><h2>ВЫПИШИ СВОИ 15 НИШ ↓</h2>
+ ${mine?`<details><summary>Мои ответы из диагностики</summary><ul>${mine}</ul></details>`:''}
+ ${S.niches.map((n,i)=>`<div class="row"><div class="num">${i+1}</div><div class="grow">${inp('niches.'+i,'Ниша')}</div></div>`).join('')}
+ ${examples('Посмотреть примеры автора',NICHE_EX)}`;};
+
+V.crit=()=>`<div class="sec">СПИСОК НИШ</div><h2>КРИТЕРИИ</h2>
+ <p class="hint">Первые три критерия обязательные. Начиная с четвёртого впиши свои: то, что важно именно тебе, чтобы понять, подходит ниша или нет.</p>
+ ${FIXED.map((c,i)=>`<div class="row"><div class="num">${i+1}</div><div class="grow"><input value="${esc(c)}" disabled></div></div>`).join('')}
+ ${S.crit.map((c,i)=>`<div class="row"><div class="num">${i+4}</div><div class="grow">${inp('crit.'+i,'Свой критерий')}</div></div>`).join('')}
+ ${examples('Посмотреть примеры автора',CRIT_HINT.map((c,i)=>(i+4)+'. '+c))}`;
+
+V.score=()=>{const ns=filledNiches(),cs=activeCrit();
+ if(!ns.length)return `<h2>Оценка ниш</h2><div class="note">Сначала выпиши ниши. Вернись на шаг назад и заполни список.</div><button class="btn" data-act="goto" data-arg="niches">Перейти к списку ниш</button>`;
+ if(S.ni>=ns.length)S.ni=0;const cur=ns[S.ni];
+ return `<div class="sec">СПИСОК НИШ. Ниша ${S.ni+1} из ${ns.length}</div><h2>${esc(cur.n)}</h2>
+ <div class="card">${cs.map(c=>{const m=S.marks[cur.i][c.i];return `<div class="crit"><span>${c.i+1}. ${esc(c.n)}</span><div class="yn">
+   <button class="${m==='Да'?'on-y':''}" data-act="mark" data-arg="${cur.i}.${c.i}.Да">Да</button>
+   <button class="${m==='Нет'?'on-n':''}" data-act="mark" data-arg="${cur.i}.${c.i}.Нет">Нет</button></div></div>`}).join('')}</div>
+ <div class="card"><div class="card-head"><div>БАЛЛОВ ВСЕГО<br><span class="hint" style="font-size:13px">(считается автоматически)</span></div><div class="score">${pts(cur.i)}</div></div></div>
+ ${S.ni<ns.length-1?`<button class="btn fill big" data-act="ni" data-arg="${S.ni+1}">Следующая ниша</button>`:''}
+ <div class="chips">${ns.map((x,k)=>`<button class="chip${k===S.ni?' cur':''}" data-act="ni" data-arg="${k}">${esc(x.n)} <b>${pts(x.i)}</b></button>`).join('')}</div>`;};
+
+function rankHtml(){const r=ranking(),max=Math.max(1,activeCrit().length);
+ return r.length?r.map(x=>`<div class="rank"><div class="name">${esc(x.n)}</div><div class="bar"><i style="width:${x.p/max*100}%"></i></div><div class="pts">${x.p}</div></div>`).join(''):'<div class="note">Пока нет ни одной ниши.</div>';}
+V.rating=()=>`<div class="sec">СПИСОК НИШ</div><h2>Рейтинг ниш по баллам</h2>
+ <p class="hint">Баллы равны количеству ответов «Да». Дальше ты проверишь ниши через периодику, Wordstat и офлайн бизнес, а потом выберешь топ-3.</p>${rankHtml()}`;
+
+function listView(key,head,sub,exHtml,fillLabel){const L=LISTS[key];
+ return `<div class="sec">${head}</div>${sub?`<p class="hint">${sub}</p>`:''}
+ ${S[key].map((r,i)=>`<div class="card"><div class="card-head"><h3>№ ${i+1}</h3>${S[key].length>1?`<button class="x" data-act="delRec" data-arg="${key}.${i}" aria-label="Удалить">×</button>`:''}</div>
+   ${L.fields.map(f=>`<label>${f[1]}</label>${inp(`${key}.${i}.${f[0]}`,'',f[2])}`).join('')}</div>`).join('')}
+ <div class="btns"><button class="btn" data-act="addRec" data-arg="${key}">Добавить строку</button>
+ ${fillLabel?`<button class="btn" data-act="fill" data-arg="${key}">${fillLabel}</button>`:''}</div>${exHtml||''}`;}
+V.period=()=>listView('period','Анализ информационной среды','Найди материалы по своим нишам: обзоры рынка, бизнес идеи, опыт предпринимателей. К каждому запиши вывод.',
+ examples('Посмотреть примеры автора',['НИША: Роспись интерьера\nТЕМА: Бизнес идеи\nЗАГОЛОВОК: Как открыть бизнес в киберспорте и не облажаться. Опыт Павла Голубева\nССЫЛКА: https://www.cossa.ru/152/214588/',
+ 'НИША: домашняя одежда\nТЕМА: обзор рынка\nИСТОЧНИК: Alto-group\nЗАГОЛОВОК: Рынок нижнего, нательного белья и домашней одежды в России. Текущая ситуация и прогноз 2021-2025 гг\nВЫВОД: Рынок просел относительно 19 г на 6%, уточнить показатели текущего года']));
+V.ws=()=>listView('ws','АНАЛИЗ СПРОСА ЧЕРЕЗ WORDSTAT','',
+ examples('Посмотреть примеры автора',['Банкротство (пример)\nСпрос на Wordstat: 1 267 087\nЛучший регион по соотношению показы / популярность: 606 / 186%\nПоказов в месяц в городе/регионе: Аксай Ростовская область\nТренд в нише: Растет\nМесяц пика: Октябрь 2021 / Ноябрь 2021',
+ 'Банкротство физических лиц (пример)\nСпрос на Wordstat: 148 644\nЛучший регион: 161 / 663%\nПоказов в месяц: Курчатов\nТренд в нише: Стоит\nМесяц пика: Ноябрь 2021',
+ 'Банкротство физ лиц (пример)\nСпрос на Wordstat: 25 210\nЛучший регион: 815 / 186%\nПоказов в месяц: Краснодар\nТренд в нише: Стоит\nМесяц пика: Ноябрь 2021']),'Подставить мои ниши как запросы');
+V.off=()=>listView('off','АНАЛИЗ ОФФЛАЙН БИЗНЕСА','','','Подставить мои ниши');
+
+V.top=()=>`<div class="sec">ТОП-3 НИШИ ДЛЯ МОЕГО БИЗНЕСА</div>
+ <h2>Выпиши ТОП-3 ниши по результатам отбора по критериям (из листа "2. Список ниш")</h2>
+ ${[0,1,2].map(i=>`<div class="row"><div class="num">${i+1}</div><div class="grow">${inp('top.'+i,'Ниша',{nl:1})}</div></div>`).join('')}
+ <button class="btn" data-act="autoTop">Подставить три ниши с лучшими баллами</button>
+ <h3 style="margin-top:24px">Рейтинг по баллам</h3>${rankHtml()}`;
+
+V.market=()=>{const xs=`<div class="calc">`;
+ return `<div class="sec">BFS | Оценка рынка</div>
+ <p class="hint">Необходимо заполнить "синие" ячейки, а также указать критерии, по которым проводится сегментация</p>
+ <div class="note">Здесь «синие» ячейки это поля ввода. Доли вводи в процентах. Количество людей в тыс чел, деньги в тыс руб, как в таблице.</div>
+ <div class="card"><h3>TAM</h3><p class="hint">Все люди России или Мира, которые теоретически могут заинтересоваться вашим продуктом / услугой</p>
+  <label>Количество людей, тыс чел</label>${inp('m.tam','62361,893',{num:1})}
+  ${xs}<div>Годовой оборот, тыс руб<b data-c="tamF"></b></div></div></div>
+ <div class="card"><h3>SAM</h3><p class="hint">Доля рынка, для которых актуален наш продукт / услуга (учитывая уровень дохода, возраст, пол, место проживания и тд)</p>
+  ${S.m.seg.map((s,i)=>`<label>Доля рынка, ограниченная</label><div class="two"><div>${inp(`m.seg.${i}.n`,SEG_PH[i])}</div><div>${inp(`m.seg.${i}.d`,'Доля, %',{num:1})}</div></div>
+  ${xs}<div>Количество людей, тыс чел<b data-c="segE${i}"></b></div><div>Годовой оборот, тыс руб<b data-c="segF${i}"></b></div></div>`).join('')}</div>
+ <div class="card"><h3>SOM</h3><p class="hint">Реально достижимый объем рынка. \nСкольких клиентов Вы можете обслужить / сколько товаров продать, учитывая ваши ресурсы? </p>
+  <label>Доля SAM, которую Вы планируете "захватить", %</label>${inp('m.som','',{num:1})}
+  ${xs}<div>Количество людей, тыс чел<b data-c="somE"></b></div><div>Годовой оборот, тыс руб<b data-c="somF"></b></div></div>
+  <label>Средний чек, тыс руб</label>${inp('m.chek','',{num:1})}
+  <label>Количество покупок 1 клиентом за год</label>${inp('m.purch','',{num:1})}
+  <label>Количество клиентов, которых Вы можете обслужить за месяц, учитывая Ваши ресурсы, тыс чел</label>${inp('m.cli','',{num:1})}
+  ${xs}<div>Годовой оборот, тыс руб<b data-c="cliF"></b></div></div></div>
+ <div class="card"><h3>Комментарии к оценке рынка</h3>
+  ${MKT_COMM.map((c,i)=>`<label>${i+1}. ${c}</label>${inp('m.c.'+i,MKT_COMM_EX[i]?'Пример: '+MKT_COMM_EX[i]:'',{area:1})}`).join('')}
+  <label>Ссылки на источники </label>${inp('m.links','',{area:1,rows:3})}</div>`;};
+
+V.comp=()=>`<div class="sec">СПИСОК КОНКУРЕНТОВ</div><div class="author">${esc(COMP_TEXT)}</div>
+ <div class="note">Записывай столько конкурентов, сколько найдёшь. Пяти достаточно, минимум три на нишу.</div>
+ <button class="btn" data-act="compTop" style="margin-top:0">Подставить мой ТОП-3 в названия ниш</button>
+ ${[0,1,2,3].map(k=>`<div class="card"><label style="margin-top:0">НИША №${k+1} "НАЗВАНИЕ"</label>${inp('compN.'+k,'Название ниши',{nl:1})}
+  ${S.comp[k].map((c,i)=>`<div class="row"><div class="num">${i+1}</div><div class="grow">${inp(`comp.${k}.${i}.n`,'Конкурент')}<div style="height:6px"></div>${inp(`comp.${k}.${i}.l`,'Ссылка/Контакт')}</div>${S.comp[k].length>1?`<button class="x" data-act="delComp" data-arg="${k}.${i}" aria-label="Удалить">×</button>`:''}</div>`).join('')}
+  <button class="btn" data-act="addComp" data-arg="${k}">Добавить конкурента</button></div>`).join('')}`;
+
+V.fin=()=>`<h1>Таблица готова</h1>
+ <p class="hint">Блокнот собрал твои ответы в Excel-файл с теми же листами и формулами, что и авторская таблица.</p>
+ <button class="btn fill big" data-act="xlsx">Скачать Excel-файл</button>
+ <div class="note">Что дальше: загрузи файл на Google Диск, открой его как Google Таблицу и действуй по правилу автора ниже. Шаг про копию уже выполнен, файл твой.</div>
+ <div class="author">${esc(RULE.join('\n'))}</div>
+ <button class="btn warn" data-act="reset">Стереть все ответы и начать заново</button>
+ <p class="saved">Авторская таблица: Сергей Мурыгин, школа «От идеи до реализации», ТЕРРА.</p>`;
+
+/* ===== Отрисовка ===== */
+function render(){const st=STEPS[S.step];
+ document.getElementById('main').innerHTML=V[st.id]();
+ document.getElementById('topTitle').textContent=st.sec+'  ('+(S.step+1)+' из '+STEPS.length+')';
+ const si=SECS.indexOf(st.sec);
+ document.getElementById('strata').innerHTML=SECS.map((s,i)=>`<i class="${i<si?'done':i===si?'now':''}"></i>`).join('');
+ document.getElementById('prevBtn').disabled=S.step===0;
+ const nb=document.getElementById('nextBtn');nb.disabled=S.step===STEPS.length-1;nb.textContent=S.step===0?'Начать':'Дальше';
+ document.getElementById('nl').innerHTML=filledNiches().map(x=>`<option value="${esc(x.n)}">`).join('');
+ updateCalc();}
+function updateCalc(){if(STEPS[S.step].id!=='market')return;const r=calc();
+ const o={tamF:r.tamF,somE:r.somE,somF:r.somF,cliF:r.cliF};r.segE.forEach((v,i)=>{o['segE'+i]=v;o['segF'+i]=r.segF[i];});
+ document.querySelectorAll('[data-c]').forEach(el=>el.textContent=fmt(o[el.dataset.c]));}
+function go(i){S.step=Math.max(0,Math.min(STEPS.length-1,i));save();render();window.scrollTo(0,0);}
+function menu(open){const m=document.getElementById('menu');
+ if(open)document.getElementById('menuIn').innerHTML=`<div class="top-row" style="margin-bottom:10px"><h2 style="flex:1">Разделы</h2><button class="menu-btn" data-act="menuClose">Закрыть</button></div>`+
+  SECS.map(s=>`<button class="go${STEPS[S.step].sec===s?' cur':''}" data-act="sec" data-arg="${esc(s)}">${esc(s)}</button>`).join('');
+ m.classList.toggle('open',open);}
+
+const A={
+ prev:()=>go(S.step-1),next:()=>go(S.step+1),
+ menu:()=>menu(true),menuClose:()=>menu(false),
+ sec:a=>{menu(false);go(STEPS.findIndex(s=>s.sec===a));},
+ goto:a=>go(STEPS.findIndex(s=>s.id===a)),
+ addDiag:a=>{S.diag[a].push({a:'',b:''});},
+ delDiag:a=>{const[q,i]=a.split('.');S.diag[q].splice(i,1);},
+ mark:a=>{const[n,c,v]=a.split('.');S.marks[n][c]=S.marks[n][c]===v?'':v;},
+ ni:a=>{S.ni=+a;window.scrollTo(0,0);},
+ addRec:a=>{S[a].push({});},
+ delRec:a=>{const[k,i]=a.split('.');S[k].splice(i,1);},
+ fill:a=>{const f=a==='ws'?'q':'n',have=S[a].map(r=>r[f]);S[a]=S[a].filter(r=>Object.values(r).some(v=>v));
+   filledNiches().forEach(x=>{if(!have.includes(x.n))S[a].push({[f]:x.n});});if(!S[a].length)S[a].push({});},
+ autoTop:()=>{const r=ranking();[0,1,2].forEach(i=>S.top[i]=r[i]?r[i].n:'');},
+ compTop:()=>{[0,1,2].forEach(i=>{if(S.top[i])S.compN[i]=S.top[i];});},
+ addComp:a=>{S.comp[a].push({n:'',l:''});},
+ delComp:a=>{const[k,i]=a.split('.');S.comp[k].splice(i,1);},
+ reset:()=>{if(confirm('Стереть все ответы? Это действие нельзя отменить.')){S=blank();}},
+ xlsx:()=>{if(typeof XLSX==='undefined'){alert('Не удалось загрузить модуль Excel. Проверь интернет и обнови страницу.');return;}
+   const nm=(S.name.trim()||'Имя Фамилия');XLSX.writeFile(buildWB(S,XLSX),nm+' - ВЫБОР НИШИ - ТЕРРА.xlsx');}
+};
+const NO_RENDER=['prev','next','menu','menuClose','sec','goto','xlsx'];
+
+/* ===== Экспорт в Excel (структура авторской таблицы) ===== */
+function buildWB(S,X){
+ const wb=X.utils.book_new();
+ function sheet(name,fill,merges){const ws={};let R=0,C=0;
+  const p=(a,v,f)=>{if(v===''||v==null){if(!f)return;}const d=X.utils.decode_cell(a);R=Math.max(R,d.r);C=Math.max(C,d.c);
+   ws[a]=f?{t:typeof v==='number'?'n':'s',v:v,f:f}:{t:typeof v==='number'?'n':'s',v:v};};
+  fill(p);ws['!ref']=X.utils.encode_range({s:{r:0,c:0},e:{r:R,c:C}});
+  if(merges)ws['!merges']=merges.map(m=>X.utils.decode_range(m));
+  ws['!cols']=Array.from({length:C+1},(_,i)=>({wch:i===0?4:24}));
+  X.utils.book_append_sheet(wb,ws,name);}
+ const col=i=>X.utils.encode_col(i);
+ const crit=FIXED.concat(S.crit);
+
+ sheet('ПРАВИЛО',p=>RULE.forEach((t,i)=>p('A'+(i+1),t)));
+
+ sheet('1. Диагностика основателя',p=>{p('B2','ДИАГНОСТИКА ОСНОВАТЕЛЯ');p('B3','Ответь на 7 простых вопросов ниже:                ');
+  DIAG.forEach((d,q)=>{p(col(1+q*2)+'4',d.q+(d.h?'\n'+d.h:''));
+   S.diag[q].filter(r=>(r.a||'').trim()||(r.b||'').trim()).forEach((r,i)=>{p(col(1+q*2)+(5+i),r.a);p(col(2+q*2)+(5+i),r.b);});});},
+  ['B4:C4','D4:E4','F4:G4','H4:I4','J4:K4','L4:M4','N4:O4']);
+
+ sheet('2. Список ниш',p=>{p('B2','СПИСОК НИШ');p('B4','ВЫПИШИ СВОИ 15 НИШ ↓');p('D4','КРИТЕРИИ');p('N4','БАЛЛОВ ВСЕГО\n(считается автоматически)');
+  crit.forEach((c,j)=>p(col(3+j)+'5',(j+1)+'. '+(c.trim()||'Свой критерий')));
+  S.niches.forEach((n,i)=>{const r=6+i;p('B'+r,i+1);p('C'+r,n);let k=0;
+   S.marks[i].forEach((m,j)=>{if(crit[j].trim()&&n.trim()){p(col(3+j)+r,m);if(m==='Да')k++;}});
+   p('N'+r,k,`COUNTIF(D${r}:M${r},"Да")`);});},['B2:N2','B4:C5','D4:M4','N4:N5']);
+
+ sheet('3. Анализ периодики',p=>{p('B2','Анализ информационной среды');p('B3','НИША');p('C3','ТЕМА');p('D3','ИСТОЧНИК');p('E3','МАТЕРИАЛ');p('G3','ВЫВОД');p('E4','ЗАГОЛОВОК');p('F4','ССЫЛКА');
+  S.period.forEach((r,i)=>['n','t','s','h','l','v'].forEach((f,j)=>p(col(1+j)+(5+i),r[f])));},['B2:G2','B3:B4','C3:C4','D3:D4','E3:F3','G3:G4']);
+
+ sheet('4. Анализ спроса через Яндекс W',p=>{p('B2','АНАЛИЗ СПРОСА ЧЕРЕЗ WORDSTAT');p('B4','№');p('C4','Запрос');p('E4','Спрос на Wordstat');p('F4','Лучший регион по соотношению\nпоказы / популярность');p('G4','Показов в месяц в городе/регионе');p('H4','Тренд в нише');p('I4','Месяц пика');
+  const n=Math.max(15,S.ws.length);for(let i=0;i<n;i++){const r=5+i,w=S.ws[i]||{};p('B'+r,i+1);p('C'+r,w.q);p('E'+r,w.d);p('F'+r,w.r);p('G'+r,w.c);p('H'+r,w.t);p('I'+r,w.m);}},['B2:I2','C4:D4']);
+
+ sheet('5. Анализ офлайн бизнеса',p=>{p('B2','АНАЛИЗ ОФФЛАЙН БИЗНЕСА');p('D4','новые конкуренты\nза 2 года');p('F4','закрытые конкуренты\n за 2 года');p('H4','регистрации \nв 2 гис/гугл/яндекс');
+  ['№','ниша','динамика','кол-во','динамика','кол-во','динамика','количество'].forEach((h,j)=>p(col(1+j)+'5',h));
+  const n=Math.max(25,S.off.length);for(let i=0;i<n;i++){const r=6+i,o=S.off[i]||{};p('B'+r,i+1);['n','nd','nc','cd','cc','rd','rc'].forEach((f,j)=>p(col(2+j)+r,o[f]));}},['B2:I2','D4:E4','F4:G4','H4:I4']);
+
+ sheet('6. ТОП НИШ',p=>{p('A2','ТОП-3 НИШИ ДЛЯ МОЕГО БИЗНЕСА');p('B3','Выпиши ТОП-3 ниши по результатам отбора по критериям (из листа "2. Список ниш")');
+  [0,1,2].forEach(i=>{p('B'+(4+i),i+1);p('C'+(4+i),S.top[i]);});},['A2:D2','B3:C3']);
+
+ sheet('9. Оценка Рынка',p=>{const m=S.m,c=calc();
+  p('A2','BFS | Оценка рынка');p('B3','Необходимо заполнить "синие" ячейки, а также указать критерии, по которым проводится сегментация');
+  p('B4','Показатель');p('C4','Пояснение');p('D4','Доля');p('E4','Количество людей, \nтыс чел');p('F4','Годовой оборот, тыс руб');
+  p('B5','TAM');p('C5','Все люди России или Мира, которые теоретически могут заинтересоваться вашим продуктом / услугой');p('D5','х');p('E5',num(m.tam));p('F5',c.tamF,'E5*F14*F15');
+  p('B6','SAM');p('C6','Доля рынка, для которых актуален наш продукт / услуга (учитывая уровень дохода, возраст, пол, место проживания и тд)');
+  m.seg.forEach((s,i)=>{const r=7+i,pr=r-1;p('C'+r,'Доля рынка, ограниченная '+(s.n.trim()||SEG_PH[i]));p('D'+r,num(s.d)/100);
+   p('E'+r,c.segE[i],i?`E${pr}*D${r}`:'E5*D7');p('F'+r,c.segF[i],i?`F${pr}*D${r}`:'F5*D7');});
+  p('B12','SOM');p('C12','Реально достижимый объем рынка. \nСкольких клиентов Вы можете обслужить / сколько товаров продать, учитывая ваши ресурсы? ');
+  p('C13','Доля SAM, которую Вы планируете "захватить"');p('D13',num(m.som)/100);p('E13',c.somE,'E8*D13');p('F13',c.somF,'F8*D13');
+  p('C14','Средний чек');p('D14','х');p('E14','х');p('F14',num(m.chek));
+  p('C15','Количество покупок 1 клиентом за год');p('D15','х');p('E15','х');p('F15',num(m.purch));
+  p('C16','Количество клиентов, которых Вы можете обслужить за месяц, учитывая Ваши ресурсы');p('D16','х');p('E16',num(m.cli));p('F16',c.cliF,'E16*F14*12');
+  p('B18','Комментарии к оценке рынка');MKT_COMM.forEach((t,i)=>{p('B'+(19+i),i+1);p('C'+(19+i),t);p('E'+(19+i),m.c[i]);});
+  p('B23','Ссылки на источники ');p('B24',m.links);},
+  ['A2:G2','C6:F6','B6:B11','C12:F12','B12:B16','C19:D19','E19:F19','C20:D20','E20:F20','C21:D21','E21:F21','C22:D22','E22:F22','B23:F23']);
+
+ sheet('7. Анализ Конкурентов',p=>{p('B2','СПИСОК КОНКУРЕНТОВ');p('B3',COMP_TEXT);
+  const n=Math.max(5,...S.comp.map(a=>a.length));
+  [0,1,2,3].forEach(k=>{p(col(3+k*2)+'4',`НИША №${k+1} "${S.compN[k].trim()||'НАЗВАНИЕ'}"`);p(col(3+k*2)+'5','Конкурент');p(col(4+k*2)+'5','Ссылка/Контакт');
+   S.comp[k].forEach((c,i)=>{p(col(3+k*2)+(6+i),c.n);p(col(4+k*2)+(6+i),c.l);});});
+  p('B6','КОНКУРЕНТЫ');for(let i=0;i<n;i++)p('C'+(6+i),i+1);},['B3:K3','B4:C5','D4:E4','F4:G4','H4:I4','J4:K4']);
+ return wb;}
+
+/* ===== Запуск ===== */
+if(typeof document!=='undefined'){
+ load();if(S.step>=STEPS.length)S.step=0;
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act;
+  A[act](b.dataset.arg);if(!NO_RENDER.includes(act)){save();render();}});
+ const onIn=e=>{const p=e.target.dataset&&e.target.dataset.p;if(!p)return;set(p,e.target.value);updateCalc();};
+ document.addEventListener('input',onIn);document.addEventListener('change',onIn);
+ render();
+}else{module.exports={buildWB,blank,calc:()=>calc(),setS:s=>{S=s}};}
+</script>
+</body>
+</html>
